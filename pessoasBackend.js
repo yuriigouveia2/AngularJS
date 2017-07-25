@@ -19,11 +19,12 @@ console.log("Listening on port " + port );*/
 var express = require('express');
 var bodyParser = require('body-parser');
 var app = express();
+var port = 8080;
 
 app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-app.use(express.bodyParser());
+/*app.use(express.bodyParser());//Dá erro quando é usado*/
 
 var operadoras = [
         {nome: "Oi", codigo: 14, categoria: "Celular"},
@@ -39,7 +40,8 @@ var pessoas = [
         {nome:"Contato", telefone:"981651219", email:"contato@contato.com",operadora: operadoras[2], cor: "red"}
       ];
 
-app.listen(process.env.PORT || 8080);
+app.listen(process.env.PORT || port);
+console.log('Listening to port ' + port);
 
 app.all('*', function(req, res, next) {
   res.header('Access-Control-Allow-Origin', '*');
