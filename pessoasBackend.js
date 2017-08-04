@@ -10,9 +10,7 @@ app.use(express.static(__dirname + '/public'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-db.serialize(function (){
-  db.run('CREATE TABLE if not exists tpessoas (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, nome VARCHAR(100), telefone VARCHAR(100), email VARCHAR(100))');
-});
+
 
 var operadoras = [
         {nome: "Oi", codigo: 14, categoria: "Celular"},
@@ -38,22 +36,39 @@ app.all('*', function(req, res, next) {
   next();
 });
 
-app.get('/pessoas', function(req, res) {
-  db.get('SELECT * FROM tpessoas', function(err, row) {
-    pessoas.push({nome: row.nome, telefone: row.telefone, email: row.email, operadora: operadoras[0]});
-    res.json(pessoas);
+/*app.param('id', function(req, res, next, id){
+  db.get('SELECT * FROM tpessoas WHERE id = ?', [id], function(err, row){
+    if(row){
+      req.pessoa = row;
+      return next();
+    }
+    res.status(404).send('Pessoa não encontrada.')
+  });
+});*/
+db.serialize(function (){
+  db.run('CREATE TABLE if not exists tpessoas (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, nome VARCHAR(100), telefone VARCHAR(100), email VARCHAR(100))');
 
+  app.get('/pessoas', function(req, res) {
+    db.all('SELECT * FROM tpessoas', function(err, rows) {
+      if(err) console.log(err);
+      console.log(rows);
+      pessoas = [];
+      for(var i = 0; i < rows.length; i++){
+        pessoas.push({nome: rows[i].nome, telefone: rows[i].telefone, email: rows[i].email, operadora: operadoras[0]});
+        console.log("row: "+ rows[i]);
+      }
+      res.json(pessoas);
+      console.log(pessoas);
+    });
+  });
+
+  app.post('/pessoas', function(req, res) {
+    pessoas.push(req.body);
+    res.json(true);
+    db.run('INSERT INTO tpessoas (nome, telefone, email) VALUES (?, ?, ?)', req.body.nome, req.body.telefone, req.body.email, operadoras[0]);
+  });
+
+  app.get('/operadoras', function(req, res) {
+    res.json(operadoras);
   });
 });
-
-app.post('/pessoas', function(req, res) {
-  pessoas.push(req.body);
-  res.json(true);
-  db.run('INSERT INTO tpessoas (nome, telefone, email) VALUES (?, ?, ?)', req.body.nome, req.body.telefone, req.body.email, operadoras[0]);
-});
-
-app.get('/operadoras', function(req, res) {
-  res.json(operadoras);
-});
-
-

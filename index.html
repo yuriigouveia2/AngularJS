@@ -32,11 +32,13 @@
 				{nome:"Contato", telefone:"981651219", email:"contato@contato.com",operadora: {nome: "Tim", codigo: 41, categoria: "Celular"}, cor: "red"}
 			];*/
 			$scope.pessoas=[];
+			$scope.selecionado = false;
 			$scope.adicionarPessoa = function (pessoa) {
 				//$scope.pessoas.push(angular.copy(pessoa)); //push adiciona elemento num array
+				console.log(pessoa);
 				$http.post("http://localhost:8080/pessoas", pessoa).then(function(response){
 					delete $scope.pessoa;
-					carregarPessoas();
+					$scope.pessoas.push(pessoa);
 				});
 			};
 			/*
@@ -54,7 +56,7 @@
 			var carregarPessoas = function (){
 				$http.get("http://localhost:8080/pessoas").then(function(response){
 					$scope.pessoas = response.data;
-					carregarPessoas();
+					console.log(response.data);
 				}, function (error){
 
 				});
@@ -72,9 +74,7 @@
 				});
 			};
 			$scope.isPessoaSelecionada = function (pessoas) {
-				return pessoas.some(function (pessoa) {
-					return pessoa.selecionado;
-				});
+				$scope.selecionado = true;
 			};
 			carregarPessoas();
 			carregarOperadoras();
@@ -93,12 +93,12 @@
 				<th>Operadora</th>
 				<th></th>
 			</tr>
-			<tr ng-class="{selecionado: pessoa.selecionado}" ng-repeat="pessoa in pessoas">
-			<td><input type="checkbox" ng-model="pessoa.selecionado"/></td>
-			<td>{{pessoa.nome}}</td>
-			<td>{{pessoa.telefone}}</td>
-			<td>{{pessoa.email}}</td>
-			<td>{{pessoa.operadora.nome}}</td>
+			<tr ng-class="{selecionado: pessoa.selecionado}" ng-repeat="item in pessoas">
+			<td><input type="checkbox" ng-change="isPessoaSelecionada()" ng-model="pessoa.selecionado"/></td>
+			<td>{{item.nome}}</td>
+			<td>{{item.telefone}}</td>
+			<td>{{item.email}}</td>
+			<td>{{item.operadora.nome}}</td>
 			<!--<td><div style="width: 20px; height: 20px;" ng-style="{'background-color': pessoa.cor}"></div></td>-->
 			<!-- O que está acima é o mesmo que está abaixo
 			<td ng-repeat="(key, value) in pessoa">
@@ -115,7 +115,7 @@
 			<option value="">Selecione uma operadora</option>
 		</select>
 		<button class="btn btn-primary btn-block" ng-click="adicionarPessoa(pessoa)" ng-disabled="!pessoa.nome || !pessoa.telefone || !pessoa.email || !pessoa.operadora.nome">Adiciona Pessoa</button>
-		<button class="btn btn-danger btn-block" ng-click="apagarPessoas(pessoas)" ng-show="isPessoaSelecionada(pessoas)">Apagar Pessoas</button>
+		<button class="btn btn-danger btn-block" ng-click="apagarPessoas(pessoas)" ng-show="selecionado">Apagar Pessoas</button>
 	</div>
 </body>
 </html>
