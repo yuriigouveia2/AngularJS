@@ -36,15 +36,6 @@ app.all('*', function(req, res, next) {
   next();
 });
 
-/*app.param('id', function(req, res, next, id){
-  db.get('SELECT * FROM tpessoas WHERE id = ?', [id], function(err, row){
-    if(row){
-      req.pessoa = row;
-      return next();
-    }
-    res.status(404).send('Pessoa não encontrada.')
-  });
-});*/
 db.serialize(function (){
   db.run('CREATE TABLE if not exists tpessoas (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, nome VARCHAR(100), telefone VARCHAR(100), email VARCHAR(100))');
 
