@@ -59,6 +59,10 @@ db.serialize(function (){
     db.run('INSERT INTO tpessoas (nome, telefone, email) VALUES (?, ?, ?)', req.body.nome, req.body.telefone, req.body.email, operadoras[0]);
   });
 
+  app.delete('/pessoas', function(req, res){
+    db.run('DELETE FROM tpessoas WHERE id = ', req.body.id);
+  });
+
   app.get('/operadoras', function(req, res) {
     res.json(operadoras);
   });

@@ -26,33 +26,18 @@
 		angular.module("cadastroPessoas", []);
 		angular.module("cadastroPessoas").controller("cadastroPessoasCtrl", function($scope, $http){
 			$scope.app="Cadastro de Pessoas";
-			/*$scope.pessoas = [
-				{nome:"Yuri", telefone:"987360638", email:"yuri@contato.com",operadora: {nome: "Oi", codigo: 14, categoria: "Celular"}, cor: "blue"},
-				{nome:"Rene", telefone:"956516511", email:"rene@contato.com",operadora: {nome: "Vivo", codigo: 15, categoria: "Celular"}, cor: "yellow"},
-				{nome:"Contato", telefone:"981651219", email:"contato@contato.com",operadora: {nome: "Tim", codigo: 41, categoria: "Celular"}, cor: "red"}
-			];*/
 			$scope.pessoas=[];
-			$scope.selecionado = false;
+			$scope.operadoras = [];
+			$scope.selecionados = false;
+
 			$scope.adicionarPessoa = function (pessoa) {
-				//$scope.pessoas.push(angular.copy(pessoa)); //push adiciona elemento num array
 				console.log(pessoa);
 				$http.post("http://localhost:8080/pessoas", pessoa).then(function(response){
 					delete $scope.pessoa;
 					$scope.pessoas.push(pessoa);
 				});
 			};
-			/*
-			$scope.operadoras = [];
-				{nome: "Oi", codigo: 14, categoria: "Celular"},
-				{nome: "Vivo", codigo: 15, categoria: "Celular"},
-				{nome: "Tim", codigo: 41, categoria: "Celular"},
-				{nome: "GVT", codigo: 25, categoria: "Fixo"},
-				{nome: "Embratel", codigo: 21, categoria: "Fixo"}
-			];*/
-			$scope.operadoras = [];
-
-
-
+		
 			var carregarPessoas = function (){
 				$http.get("http://localhost:8080/pessoas").then(function(response){
 					$scope.pessoas = response.data;
@@ -69,12 +54,15 @@
 			};
 
 			$scope.apagarPessoas = function (pessoas) {
-				$scope.pessoas = pessoas.filter(function (pessoa){
+					$scope.pessoas = pessoas.filter(function (pessoa){
 					if (!pessoa.selecionado) return pessoa;
+					console.log(pessoa);
 				});
+				
 			};
 			$scope.isPessoaSelecionada = function (pessoas) {
-				$scope.selecionado = true;
+				$scope.selecionados = true;
+				
 			};
 			carregarPessoas();
 			carregarOperadoras();
@@ -94,17 +82,11 @@
 				<th></th>
 			</tr>
 			<tr ng-class="{selecionado: pessoa.selecionado}" ng-repeat="item in pessoas">
-			<td><input type="checkbox" ng-change="isPessoaSelecionada()" ng-model="pessoa.selecionado"/></td>
+			<td><input type="checkbox" ng-change="isPessoaSelecionada()" ng-model="item	.selecionado"/></td>
 			<td>{{item.nome}}</td>
 			<td>{{item.telefone}}</td>
 			<td>{{item.email}}</td>
 			<td>{{item.operadora.nome}}</td>
-			<!--<td><div style="width: 20px; height: 20px;" ng-style="{'background-color': pessoa.cor}"></div></td>-->
-			<!-- O que está acima é o mesmo que está abaixo
-			<td ng-repeat="(key, value) in pessoa">
-			{{value}}
-			</td>
-			-->
 			</tr>
 		</table>
 		<hr/>
@@ -115,7 +97,7 @@
 			<option value="">Selecione uma operadora</option>
 		</select>
 		<button class="btn btn-primary btn-block" ng-click="adicionarPessoa(pessoa)" ng-disabled="!pessoa.nome || !pessoa.telefone || !pessoa.email || !pessoa.operadora.nome">Adiciona Pessoa</button>
-		<button class="btn btn-danger btn-block" ng-click="apagarPessoas(pessoas)" ng-show="selecionado">Apagar Pessoas</button>
+		<button class="btn btn-danger btn-block" ng-click="apagarPessoas(pessoas)" ng-show="selecionados">Apagar Pessoas</button>
 	</div>
 </body>
 </html>
